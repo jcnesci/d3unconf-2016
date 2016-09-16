@@ -90,7 +90,6 @@ nodes.forEach(function(d){
   images.push( {candidate: d.candidate, img: d.img1, type: 'not-yelling'} );
   images.push( {candidate: d.candidate, img: d.img2, type: 'yelling'} );
 });
-console.log("images", images);
 defs.selectAll("pattern")
     .data(images)
   .enter().append("pattern")
@@ -129,7 +128,6 @@ force.on("tick", function(e) {
       .attr("cy", function(d) { return d.y; });
 });
 function collide(node) {
-console.log("node.radius", node.radius)
   var r = node.radius + 16,
       nx1 = node.x - r,
       nx2 = node.x + r,
@@ -165,8 +163,6 @@ d3.tsv('data/elections.tsv', function(error, data) {
     d.Unsure = +(d.Unsure.replace('%',''));
     d['Margin of Error'] = +(d['Margin of Error'].replace('%',''));
   });
-
-console.log(data);
 
   var x = d3.scale.ordinal()
       .rangeRoundBands([0, width], .1);
@@ -211,7 +207,6 @@ console.log(data);
       .attr("y", function(d) { return y(d['Electoral College Votes']); })
       .attr("height", function(d) { return heightBarchart - y(d['Electoral College Votes']); })
       .on('mouseover', function(d){
-// console.log(d['Electoral College Votes']);
         nodes[0].radius = d.Clinton;
         nodes[0].radius +=  (nodes[0].radius * nodes[0].radius)/30;
         nodes[1].radius = d.Trump;
