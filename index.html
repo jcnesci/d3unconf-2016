@@ -2,12 +2,16 @@
 <meta charset="utf-8">
 <style>
 
+.bubble {
+  stroke-width: 10px;
+}
+
 .bar {
   fill: silver;
 }
 
 .bar:hover {
-  fill: brown;
+  fill: rgb(90,90,90);
 }
 
 .axis {
@@ -70,13 +74,15 @@ var nodes = [
     candidate: 'clinton',
     radius: 40,
     img1: 'clinton-1.jpg',
-    img2: 'clinton-2.png'
+    img2: 'clinton-2.png',
+    color: "blue"
   },
   {
     candidate: 'trump',
     radius: 40,
     img1: 'trump-1.jpg',
-    img2: 'trump-2.jpg'
+    img2: 'trump-2.jpg',
+    color: "red"
   }];
 var defs = svgBubble.append("svg:defs");
 var images = [];
@@ -111,6 +117,7 @@ var bubbles = svgBubble.selectAll("circle")
     .attr("id", function(d){ return d.candidate; })
     .attr("class", "bubble")
     .attr("r", function(d) { return d.radius; })
+    .style("stroke", function(d){ return d.color; })
     .style("fill", function(d){ return "url(#img-"+ d.candidate +"-not-yelling)"; });
 force.on("tick", function(e) {
   var q = d3.geom.quadtree(nodes),
