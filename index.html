@@ -35,7 +35,6 @@ var margin = {top: 20, right: 20, bottom: 30, left: 40},
     height = 600 - margin.top - margin.bottom,
     heightBubble = height * 0.6,
     heightBarchart = height * 0.4;
-
 var svgParent = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom);
@@ -43,9 +42,29 @@ var svgBubble = svgParent.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 var svgBarchart = svgParent.append("g")
     .attr("transform", "translate(" + margin.left + "," + (margin.top + heightBubble) + ")");
+var fontSize = 92;
 
 //
 
+svgBubble.append("text")
+  .attr("id", "votes-clinton")
+  .attr("x", 0)
+  .attr("y", heightBubble/2)
+  .style("fill", "blue")
+  .style("font-size", fontSize +"px")
+  .style("font-weight", "bold")
+  .style("font-family", "sans-serif")
+  .text("Clinton");
+svgBubble.append("text")
+  .attr("id", "votes-trump")
+  .attr("x", width)
+  .attr("y", heightBubble/2)
+  .style("fill", "red")
+  .style("font-size", fontSize +"px")
+  .style("font-weight", "bold")
+  .style("font-family", "sans-serif")
+  .style("text-anchor", "end")
+  .text("Trump");
 var nodes = [
   {
     candidate: 'clinton',
@@ -81,8 +100,8 @@ defs.selectAll("pattern")
       .attr("preserveAspectRatio", "none");
 var force = d3.layout.force()
     .gravity(5)
-    .charge(100)
-    .linkDistance(0)
+    .charge(10)
+    .linkDistance(-2000)
     .nodes(nodes)
     .size([width, heightBubble])
     .start();
@@ -103,6 +122,7 @@ force.on("tick", function(e) {
       .attr("cy", function(d) { return d.y; });
 });
 function collide(node) {
+console.log("node.radius", node.radius)
   var r = node.radius + 16,
       nx1 = node.x - r,
       nx2 = node.x + r,
@@ -186,28 +206,38 @@ console.log(data);
       .on('mouseover', function(d){
 // console.log(d['Electoral College Votes']);
         nodes[0].radius = d.Clinton;
+        nodes[0].radius +=  (nodes[0].radius * nodes[0].radius)/30;
         nodes[1].radius = d.Trump;
+        nodes[1].radius +=  (nodes[1].radius * nodes[1].radius)/30;
+        //
         var bubbleInFront, bubbleInBack;
         if (d.Clinton >= d.Trump) {
-          bubbleInFront = "#trump";
-          bubbleInBack = "#clinton";
+          bubbleInFront = "trump";
+          bubbleInBack = "clinton";
         } else {
-          bubbleInFront = "#clinton";
-          bubbleInBack = "#trump";
+          bubbleInFront = "clinton";
+          bubbleInBack = "trump";
         }
-        d3.select( ".bubble"+bubbleInFront ).moveToFront();
-        d3.select( ".bubble"+bubbleInFront ).style("fill", function(d){ return "url(#img-"+ d.candidate +"-not-yelling)"; });
-        d3.select( ".bubble"+bubbleInBack ).style("fill", function(d){ return "url(#img-"+ d.candidate +"-yelling)"; });
+        d3.select( ".bubble#"+bubbleInFront ).moveToFront();
+        d3.select( ".bubble#"+bubbleInFront ).style("fill", function(d){ return "url(#img-"+ d.candidate +"-not-yelling)"; });
+        d3.select( ".bubble#"+bubbleInBack ).style("fill", function(d){ return "url(#img-"+ d.candidate +"-yelling)"; });
+        //
         bubbles
           .transition()
             .duration(100)
-            .attr("r", function(d) { return d.radius + (d.radius * d.radius)/30; })
+            // .attr("r", function(d) { return d.radius + (d.radius * d.radius)/30; })
+            .attr("r", function(d) { return d.radius; })
             .attr("cx", function(d) {
               return d.x + ((Math.random() - .5) * 50);
             })
             .attr("cy", function(d) {
               return d.y + ((Math.random() - .5) * 50);
             });
+        //
+        d3.select("#votes-clinton").text(d.Clinton +"%");
+        d3.select("#votes-trump").text(d.Trump +"%");
+        d3.select("#votes-"+bubbleInFront).style("font-size", fontSize/2 +"px");
+        d3.select("#votes-"+bubbleInBack).style("font-size", fontSize +"px");
       });
 
 });
